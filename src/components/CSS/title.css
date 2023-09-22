@@ -1,0 +1,24 @@
+#title-name{
+    font-family: 'Gagalin', sans-serif;
+    font-size: 24px
+}
+
+#title{
+    height: 68.8vh;
+    padding-top: 177px;
+}
+
+.top-camera {
+    position: absolute;
+    right: 300px;
+    top: 140px;
+    overflow-clip-margin: content-box;
+    overflow: clip;
+}
+.top-plane{
+    position: absolute;
+    right: 700px;
+    top: 140px;
+    overflow-clip-margin: content-box;
+    overflow: clip;
+}
