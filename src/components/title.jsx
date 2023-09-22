@@ -3,6 +3,7 @@ import './CSS/title.css';
 import cam from '../assets/images/camera.png';
 import plane from '../assets/images/aeroplane.png';
 import memoji from '../assets/images/Memoji.png';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 function title(){
     return(
