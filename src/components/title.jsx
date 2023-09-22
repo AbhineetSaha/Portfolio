@@ -16,7 +16,7 @@ function title(){
                 <img src={memoji} className="d-block mx-lg-auto img-fluid meme" alt="Memoji" height="700px" loading="lazy" />
               </div>
               <div className="col-lg-6">
-                <h1 classNameName="display-3 fw-bold text-body-emphasis lh-1 mb-4 typewriter">Hello!</h1>
+                <h1 className="display-3 fw-bold text-body-emphasis lh-1 mb-4 typewriter">Hello!</h1>
                 <p className="lead" id="title-name">This is Abhineet Saha</p>
                 <p className="lead" id="title-name">An 18 year old programmer</p>
                 <div className="d-grid gap-2 d-md-flex justify-content-md-start">
