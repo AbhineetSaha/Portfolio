@@ -68,11 +68,11 @@
     }
 
     .memoji{
-        padding-top: 60px;
         margin-left: 50px;
     }
     
     .meme{
+        padding-top: 60px;
         padding-left: 0;
         margin-left: 10px;
         height: 450px;
