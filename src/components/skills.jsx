@@ -23,6 +23,7 @@ function skills(){
         <div className="row">
           <Container url="https://www.python.org/" img={python} alt='python-logo' p="I have knowledge of Python ogramming Language and it's known libraries."/>
           <Container url="https://www.java.com/" img={java} alt='java-logo' p="Have knowledge in Object Oriented Programming and Framesworks in Java Programming Language."/>
+          <Container url="https://www.javascript.com/" img="https://cdn-icons-png.flaticon.com/512/5968/5968292.png" alt="JS-logo"/>
         </div>
     </div>
 </section>
