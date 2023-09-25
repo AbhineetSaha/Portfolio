@@ -10,6 +10,7 @@ function contact(){
         <li className="nav-item"><a href="https://www.linkedin.com/in/abhineet-saha-317472203/" class="nav-link px-2 text-body-secondary">LinkedIn</a></li>
         <li className="nav-item"><a href="https://twitter.com/_Itz4vI_" class="nav-link px-2 text-body-secondary">Twitter</a></li>
     </ul>
+    <p className="text-center text-body-secondary">Email - abhineetsaha.2004@gmail.com</p>
     </footer>
     </div>
     </section>
