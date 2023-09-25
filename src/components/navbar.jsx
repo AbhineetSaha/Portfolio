@@ -13,7 +13,7 @@ function navbar(){
           <ul>
             <li><a href="#">Home</a></li>
             <li><a href="#me">About</a></li>
-            <li><a href="#experience">Skills</a></li>
+            <li><a href="#skills">Skills</a></li>
             <li><a href="#contact">Contacts</a></li>
           </ul>
         </nav>

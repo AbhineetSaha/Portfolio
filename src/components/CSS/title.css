@@ -26,21 +26,25 @@
 }
 
 #title{
-    height: 68.8vh;
+    height: 65.8vh;
     padding-top: 177px;
+    overflow: hidden;
 }
 
+.meme{
+    margin-top: 40px;
+}
 .top-camera {
     position: absolute;
     right: 300px;
     top: 140px;
     overflow-clip-margin: content-box;
-    overflow: clip;
+    overflow: hidden;
 }
 .top-plane{
     position: absolute;
     right: 700px;
     top: 140px;
     overflow-clip-margin: content-box;
-    overflow: clip;
+    overflow: hidden;
 }
