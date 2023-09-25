@@ -7,10 +7,10 @@ import './CSS/skills.css';
 function Container(props){
   console.log(props);
   return (
-    <div className="col-lg-6 mt-5">
+    <div className="col-lg-6 col-md-12 col-sm-12 mt-5">
       <a href = {props.url}>
-      <img src={props.img} alt={props.alt} height="60" /></a>
-      <p className="col-lg-8 mx-auto lead mt-5">{props.p}</p>
+      <img src={props.img} alt={props.alt} height="60" className="img" /></a>
+      <p className="col-lg-8 col-md-12 col-sm-12 mx-auto lead mt-5">{props.p}</p>
     </div>
   );
 }

@@ -2,3 +2,15 @@
     border-radius: 50%;
     height: 30vh;
 }
+
+
+@media (min-width: 720px) and (min-height: 1280px) {
+    .profile-img{
+        border-radius: 50%;
+        height: 15vh;
+    }
+
+    *{
+        font-size: 18px;
+    }
+}
