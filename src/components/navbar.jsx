@@ -32,7 +32,7 @@ window.onscroll = () => {
       navbar.classList.remove('navbar-active','gradient-background');
   }
   }else{
-    if (window.scrollY > 300) {
+    if (window.scrollY > 120) {
       navbar.classList.add('navbar-active','gradient-background');
   } else {
       navbar.classList.remove('navbar-active','gradient-background');
