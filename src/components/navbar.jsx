@@ -5,11 +5,11 @@ import logo from '../assets/images/603d09f78dda4d62a32dd10a8ce9ad0e.png'
 function navbar(){
     return(
       <header id="header">
-      <div class="navbar">
-        <a href="#" class="logo">
+      <div className="navbar">
+        <a href="#" className="logo">
           <img id="logo" src={logo} alt="logo" />
         </a>
-        <nav class="main-nav">
+        <nav className="main-nav">
           <ul>
             <li><a href="#">Home</a></li>
             <li><a href="#me">About</a></li>
@@ -21,5 +21,15 @@ function navbar(){
     </header>
 )
 }
+
+
+window.onscroll = () => {
+  const navbar = document.querySelector('.navbar');
+  if (window.scrollY > 600) {
+      navbar.classList.add('navbar-active','gradient-background');
+  } else {
+      navbar.classList.remove('navbar-active','gradient-background');
+  }
+};
 
 export default navbar;

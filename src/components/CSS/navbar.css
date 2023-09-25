@@ -45,6 +45,7 @@
 .navbar-active {
     background-size: 400% 400%;
     max-width: 100%;
+    box-shadow: 0 0 10px 0 rgba(0,0,0,0.3);
 }
 
 .main-nav ul{
