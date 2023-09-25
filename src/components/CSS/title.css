@@ -62,7 +62,7 @@
     }
     
     #title{
-        height: 25.5vh;
+        height: 28.5vh;
         padding-top: 177px;
         overflow: hidden;
     }
@@ -72,7 +72,7 @@
     }
     
     .meme{
-        padding-top: 5px;
+        padding-top: 0;
         padding-left: 0;
         margin-left: 10px;
         height: 450px;
