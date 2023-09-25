@@ -68,13 +68,15 @@
     }
 
     .memoji{
-        margin-left: 60px;
+        padding-top: 60px;
+        margin-left: 50px;
     }
     
     .meme{
-        margin-left: 40px;
-        height: 70px;
-        width: 70px;
+        padding-left: 0;
+        margin-left: 10px;
+        height: 450px;
+        width: 450px;
     }
     
     .top-camera {
