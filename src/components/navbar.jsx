@@ -25,10 +25,18 @@ function navbar(){
 
 window.onscroll = () => {
   const navbar = document.querySelector('.navbar');
-  if (window.scrollY > 600) {
+  if (window.width>1280){
+    if (window.scrollY > 600) {
       navbar.classList.add('navbar-active','gradient-background');
   } else {
       navbar.classList.remove('navbar-active','gradient-background');
+  }
+  }else{
+    if (window.scrollY > 300) {
+      navbar.classList.add('navbar-active','gradient-background');
+  } else {
+      navbar.classList.remove('navbar-active','gradient-background');
+  }
   }
 };
 
