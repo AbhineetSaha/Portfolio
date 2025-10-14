@@ -16,10 +16,35 @@ import {
   TrendingUp,
   Users,
   Download,
+  type LucideIcon,
 } from "lucide-react";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { MagneticButton } from "@/components/magnetic-button";
 import { AnimatedCounter } from "@/components/animated-counter";
+
+type ProjectMetric = {
+  icon: LucideIcon;
+  label: string;
+  value: number;
+  suffix: string;
+};
+
+type ProjectLinks = {
+  github: string;
+  demo: string;
+};
+
+type Project = {
+  title: string;
+  description: string;
+  status: string;
+  technologies: string[];
+  metrics: ProjectMetric[];
+  links: ProjectLinks;
+  image?: string;
+  liveThumbnail?: boolean;
+  private?: boolean;
+};
 
 export function ProjectsSection() {
   const [privateDialogOpen, setPrivateDialogOpen] = useState(false);
@@ -27,7 +52,28 @@ export function ProjectsSection() {
     null
   );
 
-  const projects = [
+  const projects: Project[] = [
+    {
+      title: "DocDrift",
+      description:
+        "Document-grounded AI workspace enabling teams to upload PDFs, curate context, and chat with a Gemini-powered assistant that cites the most relevant snippets.",
+      image: "/docdrift.png",
+      technologies: ["Next.js", "FastAPI", "Supabase", "Gemini"],
+      metrics: [
+        { icon: Download, label: "PDFs Indexed", value: 1200, suffix: "+" },
+        {
+          icon: TrendingUp,
+          label: "Context Match Accuracy",
+          value: 92,
+          suffix: "%",
+        },
+      ],
+      links: {
+        github: "https://github.com/AbhineetSaha/DocDrift",
+        demo: "https://docdrift-abhineet.vercel.app/login",
+      },
+      status: "Jun 2024 - Present",
+    },
     {
       title: "PyxTrace",
       description:
@@ -49,29 +95,25 @@ export function ProjectsSection() {
       },
       status: "Mar 2025 - Present",
     },
-    {
-      title: "InTrain Tech - Customer Sentiment Analysis",
-      description:
-        "ML pipeline processing 100K+ reviews to uncover actionable insights for customer-focused decision-making. Optimized for 40% faster inference time.",
-      image: "/sentiment-analysis-dashboard.jpg",
-      technologies: ["Python", "NumPy", "Scikit-Learn", "NLTK"],
-      metrics: [
-        { icon: Users, label: "Reviews Processed", value: 100, suffix: "K+" },
-        {
-          icon: TrendingUp,
-          label: "Performance Boost",
-          value: 40,
-          suffix: "%",
-        },
-      ],
-      private: true,
-      links: {
-        github: "#",
-        demo: "#",
-      },
-      status: "Jan 2024 - Mar 2024",
-    },
   ];
+
+  const fallbackImage =
+    "/placeholder.svg?height=200&width=400&query=modern dashboard interface";
+
+  const getProjectImageSrc = (project: Project) => {
+    if (
+      project.liveThumbnail &&
+      project.links.demo &&
+      project.links.demo !== "#" &&
+      project.links.demo.startsWith("http")
+    ) {
+      return `https://image.thum.io/get/width/1200/crop/800/${encodeURIComponent(
+        project.links.demo
+      )}`;
+    }
+
+    return project.image || fallbackImage;
+  };
 
   return (
     <section id="projects" className="py-20 bg-muted/30">
@@ -105,21 +147,26 @@ export function ProjectsSection() {
               direction={index % 2 === 0 ? "left" : "right"}
               delay={200 + index * 100}
             >
-              <Card className="overflow-hidden hover:shadow-2xl transition-all duration-500 group hover:scale-[1.02] bg-gradient-to-br from-card to-card/50">
+              <Card className="overflow-hidden pt-0 hover:shadow-2xl transition-all duration-500 group hover:scale-[1.02] bg-gradient-to-br from-card to-card/50">
                 <div className="relative overflow-hidden">
                   <img
-                    src={
-                      project.image ||
-                      "/placeholder.svg?height=200&width=400&query=modern dashboard interface"
-                    }
+                    src={getProjectImageSrc(project)}
                     alt={project.title}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-48 object-cover object-top group-hover:scale-110 transition-transform duration-500"
+                    onError={(event) => {
+                      if (
+                        event.currentTarget.dataset.fallbackApplied === "true"
+                      )
+                        return;
+                      event.currentTarget.dataset.fallbackApplied = "true";
+                      event.currentTarget.src = project.image || fallbackImage;
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute top-4 right-4">
                     <Badge
                       variant="secondary"
-                      className="bg-background/90 backdrop-blur-sm"
+                      className="bg-slate-900/80 text-white border-none backdrop-blur-sm"
                     >
                       {project.status}
                     </Badge>
