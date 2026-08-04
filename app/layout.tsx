@@ -3,10 +3,10 @@ import { site } from "@/lib/content"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: site.title,
+  title: site.name,
   description: site.description,
   openGraph: {
-    title: site.title,
+    title: site.name,
     description: site.description,
     type: "website",
   },
