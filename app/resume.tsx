@@ -28,7 +28,10 @@ export function ResumeButton() {
         onClick={(e) => {
           if (e.target === ref.current) ref.current.close();
         }}
-        className="m-auto flex h-[90dvh] w-[min(56rem,94vw)] flex-col border border-rule bg-paper p-0 text-ink backdrop:bg-ink/50"
+        // `open:flex`, not `flex`: an unconditional display value overrides the
+        // UA's `dialog:not([open]) { display: none }` and leaves the dialog
+        // rendered inline on page load.
+        className="m-auto h-[90dvh] w-[min(56rem,94vw)] flex-col border border-rule bg-paper p-0 text-ink backdrop:bg-ink/50 open:flex"
       >
         <div className="flex items-baseline justify-between gap-4 border-b border-rule px-5 py-3">
           <p className="font-mono text-xs uppercase tracking-wider text-muted">
