@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { ResumeButton } from "./resume";
 import { Section } from "./section";
 import {
+  certifications,
   education,
   intro,
+  leadership,
   links,
   now,
   projects,
@@ -31,6 +34,7 @@ export default function Home() {
           {[
             { label: "GitHub", href: links.github },
             { label: "LinkedIn", href: links.linkedin },
+            { label: "LeetCode", href: links.leetcode },
             { label: "Email", href: `mailto:${links.email}` },
           ].map((link) => (
             <li key={link.label}>
@@ -42,6 +46,9 @@ export default function Home() {
               </a>
             </li>
           ))}
+          <li>
+            <ResumeButton />
+          </li>
         </ul>
       </section>
 
@@ -160,11 +167,41 @@ export default function Home() {
         <ul>
           {education.map((item) => (
             <li key={item.role}>
-              <h3 className="font-medium">{item.role}</h3>
-              <p className="mt-1 font-mono text-xs text-muted">{item.org}</p>
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                <h3 className="font-medium">{item.role}</h3>
+                <span className="font-mono text-xs text-muted tabular-nums">
+                  {item.period}
+                </span>
+              </div>
+              <p className="mt-1 font-mono text-xs text-muted">
+                {item.org} · {item.note}
+              </p>
             </li>
           ))}
         </ul>
+      </Section>
+
+      <Section title="Elsewhere">
+        <dl className="space-y-5">
+          <div>
+            <dt className="font-mono text-xs text-accent">Certifications</dt>
+            <dd className="mt-1">
+              <ul className="space-y-1 leading-relaxed text-ink/85">
+                {certifications.map((item) => (
+                  <li key={item.name}>{item.name}</li>
+                ))}
+              </ul>
+            </dd>
+          </div>
+          {leadership.map((item) => (
+            <div key={item.org}>
+              <dt className="font-mono text-xs text-accent">
+                {item.role} · {item.org}
+              </dt>
+              <dd className="mt-1 leading-relaxed text-ink/85">{item.body}</dd>
+            </div>
+          ))}
+        </dl>
       </Section>
 
       <Section title="Stack">

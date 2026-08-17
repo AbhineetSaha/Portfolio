@@ -15,7 +15,8 @@ export const site = {
 
 export const links = {
   github: "https://github.com/AbhineetSaha",
-  linkedin: "https://www.linkedin.com/in/abhineet-saha-317472203/",
+  linkedin: "https://www.linkedin.com/in/abhineetsaha/",
+  leetcode: "https://leetcode.com/u/AbhineetSaha/",
   email: "abhineetsaha.work@gmail.com",
 };
 
@@ -68,7 +69,15 @@ export const projects: Project[] = [
     tagline: "Python runtime tracer · on PyPI",
     summary:
       "Traces a Python program’s bytecode, heap and syscalls on one timeline, then renders it live. Published to PyPI as pyxtrace, MIT licensed.",
-    stack: ["Python", "sys.settrace", "tracemalloc", "strace", "Streamlit"],
+    stack: [
+      "Python",
+      "sys.settrace",
+      "tracemalloc",
+      "strace",
+      "Typer",
+      "Streamlit",
+      "GitHub Actions",
+    ],
     source: "https://github.com/AbhineetSaha/pyxTrace",
     external: { label: "PyPI", href: "https://pypi.org/project/pyxtrace/" },
     detail: {
@@ -84,6 +93,8 @@ export const projects: Project[] = [
         "Three independent collectors — a sys.settrace hook for bytecode, periodic tracemalloc snapshots for the heap, and strace for syscalls — emit into one ordered event stream.",
         "Output is either a Rich summary in the terminal or an optional Streamlit dashboard, so the common case needs no browser.",
         "Presets (demo, perf, full) pick a tracing depth, because full bytecode tracing is far too heavy to be the default.",
+        "Sessions record to JSONL and replay offline, so a trace can be analysed after the fact rather than only while it runs.",
+        "Releases publish to PyPI from GitHub Actions, because a manual publish step is a release that eventually doesn’t happen.",
       ],
       challenges: [
         "Tracing every bytecode instruction is expensive enough to distort the program being measured. The presets and an event-rate throttle (10–500 events/sec) exist to keep the observer from becoming the bottleneck.",
@@ -97,7 +108,14 @@ export const projects: Project[] = [
     tagline: "Routing scored on real accident data",
     summary:
       "Scores alternative driving routes against government road-accident records (MoRTH, NCRB, iRAD) and recommends the safest one, not just the fastest.",
-    stack: ["FastAPI", "PostgreSQL", "PostGIS", "Redis", "React", "Docker"],
+    stack: [
+      "FastAPI",
+      "PostGIS",
+      "LightGBM",
+      "Redis",
+      "React",
+      "Docker",
+    ],
     source: "https://github.com/AbhineetSaha/SafeRoute-India",
     detail: {
       overview:
@@ -113,6 +131,8 @@ export const projects: Project[] = [
         "Those incidents are weighted by severity (fatal, grievous, minor), recency, and time-of-day pattern — a late-night blackspot should not penalise a 9am commute equally.",
         "Scored routes are cached in Redis, since the same corridors get requested constantly and the spatial query is the expensive part.",
         "Hotspot clustering surfaces dangerous stretches directly on the map instead of hiding them inside a score.",
+        "A LightGBM model over 24 engineered features — severity, causal factors, temporal pattern, weather, distance to emergency infrastructure — handles risk prediction where the historical counts are too sparse to score directly.",
+        "Thirteen REST endpoints cover route scoring, hotspot analysis, departure-time optimisation, risk forecasting, SOS context and community incident reporting.",
       ],
       challenges: [
         "Government accident data arrives in inconsistent shapes across sources and needs normalising before any of it is spatially queryable.",
@@ -142,7 +162,10 @@ export type WorkPost = {
 export const profound = {
   slug: "profound",
   org: "Profound",
-  role: "Software Engineer",
+  /** The legal entity, for anyone matching this against a CV. */
+  company: "Cooper Square Technologies Inc.",
+  role: "Software Engineer · Independent Contractor",
+  location: "Remote",
   period: "Jan 2026 — Aug 2026",
   /** Homepage blurb for the Work section. */
   summary:
@@ -505,13 +528,69 @@ export const education = [
   {
     role: "B.Tech, Computer Science and Engineering",
     org: "Vellore Institute of Technology, Andhra Pradesh",
+    period: "2022 — 2026",
+    note: "CGPA 9.25",
   },
 ];
 
+export const certifications = [
+  {
+    name: "Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate",
+    issuer: "Oracle",
+  },
+  {
+    name: "Microsoft Certified: Azure AI Engineer Associate",
+    issuer: "Microsoft",
+  },
+];
+
+/** Things I did that weren't a job and weren't a repo. */
+export const leadership = [
+  {
+    role: "Technical Lead",
+    org: "Mozilla Open Source Community, VIT-AP",
+    body: "Led a cross-functional team of 12+, contributing to global open-source projects and mentoring juniors on GitHub workflows and software architecture.",
+  },
+  {
+    role: "Finalist",
+    org: "Google Dev Sprint '25",
+    body: "Built and presented a working prototype under time constraints, judged by industry leads.",
+  },
+];
+
+/**
+ * The résumé, as it reads on the PDF. Only the parts that don't already exist
+ * elsewhere in this file live here — education, certifications, leadership,
+ * stack and the project list are reused rather than restated.
+ */
+export const resume = {
+  phone: "+91 9933998330",
+  bullets: {
+    profound: [
+      "Designed and shipped a route-binding migration engine that turned destructive URL changes into a confidence-scored, reviewable workflow, preventing broken content bindings.",
+      "Optimised PostgreSQL/tRPC APIs by eliminating N+1 queries, adding indexes and batching, and fixing cross-tenant scans across endpoints with 1.8–6.5s p99 latency.",
+      "Improved reliability and security by authoring 34% of the test suite, implementing multi-tenant database scoping, and remediating 2 SSRF vulnerabilities, 1 XSS vector and 1 CVE.",
+      "Rebuilt the Media Library using a blue-green migration, and co-led the Sanity-to-ProfoundCMS migration, contributing roughly 48% of the CMS integration layer.",
+    ],
+    pyxtrace: [
+      "Built and published an open-source Python profiler to PyPI, combining bytecode tracing, heap profiling and OS syscall monitoring with real-time visualisation.",
+      "Designed a cross-platform tracing architecture with pluggable Linux, macOS, Windows and fallback backends.",
+      "Implemented configurable tracing modes to balance profiling depth against runtime overhead, making long-running workloads practical to trace.",
+      "Automated PyPI releases with GitHub Actions and added JSONL session recording with offline replay.",
+    ],
+    "saferoute-india": [
+      "Architected an accident-aware route scoring platform over Indian government accident datasets, scoring routes 0–100 on severity, distance, recency and time-of-day risk.",
+      "Built a PostGIS geospatial scoring engine to analyse accident exposure along route corridors and identify safety hotspots across road networks.",
+      "Developed a LightGBM risk prediction pipeline using 24 engineered features covering severity, causal factors, temporal patterns, weather and emergency infrastructure.",
+      "Delivered 13 REST APIs for route scoring, hotspot analysis, departure-time optimisation, risk forecasting, SOS context and community incident reporting.",
+    ],
+  } as Record<string, string[]>,
+};
+
 export const stack = [
-  { label: "Languages", items: "TypeScript · Python · JavaScript · Java" },
-  { label: "Backend", items: "FastAPI · Node.js · Express" },
-  { label: "Frontend", items: "React · Next.js" },
+  { label: "Languages", items: "TypeScript · Python · JavaScript · Java · SQL" },
+  { label: "Backend", items: "Node.js · Express · FastAPI · tRPC" },
+  { label: "Frontend", items: "React · Next.js · Tailwind CSS" },
   { label: "Data", items: "PostgreSQL · PostGIS · Redis · Supabase" },
-  { label: "Tools", items: "Git · Docker · Linux" },
+  { label: "Tools", items: "Git · GitHub Actions · Docker · Linux · Bun" },
 ];
