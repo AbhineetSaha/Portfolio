@@ -1,69 +1,204 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Section } from "./section";
+import {
+  education,
+  intro,
+  links,
+  now,
+  projects,
+  site,
+  stack,
+  work,
+} from "./content";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-6">
+      {/* Identity — everything that matters is above the fold. */}
+      <section className="pt-20 sm:pt-28">
+        <h1 className="text-3xl font-medium tracking-tight sm:text-4xl">
+          {site.name}
+        </h1>
+        <p className="mt-2 font-mono text-sm text-accent">{site.role}</p>
+
+        <div className="mt-8 space-y-4 text-base leading-relaxed text-ink/90 sm:text-lg sm:leading-relaxed">
+          {intro.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+
+        <ul className="mt-8 flex flex-wrap gap-x-5 gap-y-2 font-mono text-xs">
+          {[
+            { label: "GitHub", href: links.github },
+            { label: "LinkedIn", href: links.linkedin },
+            { label: "Email", href: `mailto:${links.email}` },
+          ].map((link) => (
+            <li key={link.label}>
+              <a
+                href={link.href}
+                className="border-b border-rule pb-0.5 text-muted transition-colors hover:border-accent hover:text-ink"
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/* Work and Projects are deliberately separate: one is a job, the other
+          is what I build on my own. Conflating them overstates both. */}
+      <Section title="Work">
+        <ol className="-mt-2 space-y-6">
+          {work.map((role) => (
+            <li key={role.slug} className="group">
+              <div className="flex flex-wrap items-baseline justify-between gap-x-4">
+                <h3 className="text-lg font-medium tracking-tight">
+                  <Link
+                    href={`/work/${role.slug}`}
+                    className="transition-colors group-hover:text-accent"
+                  >
+                    {role.org}
+                    <span
+                      aria-hidden
+                      className="ml-1.5 inline-block text-muted transition-transform duration-200 group-hover:translate-x-1 group-hover:text-accent"
+                    >
+                      →
+                    </span>
+                  </Link>
+                </h3>
+                <span className="font-mono text-xs text-muted tabular-nums">
+                  {role.period}
+                </span>
+              </div>
+              <p className="mt-1 font-mono text-xs text-muted">{role.role}</p>
+              <p className="mt-3 leading-relaxed text-ink/85">{role.summary}</p>
+              <p className="mt-3 font-mono text-xs text-muted">
+                {role.stack.join(" · ")}
+              </p>
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section title="Projects">
+        <ol className="-mt-2">
+          {projects.map((project, i) => (
+            <li
+              key={project.slug}
+              className="group border-t border-rule py-6 first:border-t-0 first:pt-0"
+            >
+              <div className="flex items-baseline gap-3">
+                <span
+                  aria-hidden
+                  className="font-mono text-xs text-muted tabular-nums"
+                >
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="text-lg font-medium tracking-tight">
+                  <Link
+                    href={`/projects/${project.slug}`}
+                    className="transition-colors group-hover:text-accent"
+                  >
+                    {project.name}
+                    <span
+                      aria-hidden
+                      className="ml-1.5 inline-block text-muted transition-transform duration-200 group-hover:translate-x-1 group-hover:text-accent"
+                    >
+                      →
+                    </span>
+                  </Link>
+                </h3>
+              </div>
+
+              <p className="mt-1 pl-8 font-mono text-xs text-muted">
+                {project.tagline}
+              </p>
+              <p className="mt-3 pl-8 leading-relaxed text-ink/85">
+                {project.summary}
+              </p>
+              <p className="mt-3 pl-8 font-mono text-xs text-muted">
+                {project.stack.join(" · ")}
+              </p>
+
+              {(project.source || project.external) && (
+                <p className="mt-3 flex gap-4 pl-8 font-mono text-xs">
+                  {project.source && (
+                    <a
+                      href={project.source}
+                      className="border-b border-rule pb-0.5 text-muted transition-colors hover:border-accent hover:text-ink"
+                    >
+                      Source ↗
+                    </a>
+                  )}
+                  {project.external && (
+                    <a
+                      href={project.external.href}
+                      className="border-b border-rule pb-0.5 text-muted transition-colors hover:border-accent hover:text-ink"
+                    >
+                      {project.external.label} ↗
+                    </a>
+                  )}
+                </p>
+              )}
+            </li>
+          ))}
+        </ol>
+      </Section>
+
+      <Section title="Currently">
+        <dl className="space-y-5">
+          {now.map((item) => (
+            <div key={item.label}>
+              <dt className="font-mono text-xs text-accent">{item.label}</dt>
+              <dd className="mt-1 leading-relaxed text-ink/85">{item.body}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+
+      <Section title="Education">
+        <ul>
+          {education.map((item) => (
+            <li key={item.role}>
+              <h3 className="font-medium">{item.role}</h3>
+              <p className="mt-1 font-mono text-xs text-muted">{item.org}</p>
+            </li>
+          ))}
+        </ul>
+      </Section>
+
+      <Section title="Stack">
+        <dl className="space-y-3">
+          {stack.map((group) => (
+            <div
+              key={group.label}
+              className="sm:flex sm:items-baseline sm:gap-4"
+            >
+              <dt className="font-mono text-xs text-muted sm:w-24 sm:shrink-0">
+                {group.label}
+              </dt>
+              <dd className="text-ink/85">{group.items}</dd>
+            </div>
+          ))}
+        </dl>
+      </Section>
+
+      <Section title="Contact">
+        <p className="leading-relaxed text-ink/85">
+          Best reached by email. I read everything, and I reply to anything that
+          isn&rsquo;t a template.
+        </p>
+        <ul className="mt-4 space-y-2 font-mono text-sm">
+          <li>
+            <a
+              href={`mailto:${links.email}`}
+              className="border-b border-rule pb-0.5 transition-colors hover:border-accent hover:text-accent"
+            >
+              {links.email}
+            </a>
+          </li>
+        </ul>
+      </Section>
+    </main>
   );
 }
