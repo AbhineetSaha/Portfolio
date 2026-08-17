@@ -558,34 +558,8 @@ export const leadership = [
   },
 ];
 
-/**
- * The résumé, as it reads on the PDF. Only the parts that don't already exist
- * elsewhere in this file live here — education, certifications, leadership,
- * stack and the project list are reused rather than restated.
- */
-export const resume = {
-  phone: "+91 9933998330",
-  bullets: {
-    profound: [
-      "Designed and shipped a route-binding migration engine that turned destructive URL changes into a confidence-scored, reviewable workflow, preventing broken content bindings.",
-      "Optimised PostgreSQL/tRPC APIs by eliminating N+1 queries, adding indexes and batching, and fixing cross-tenant scans across endpoints with 1.8–6.5s p99 latency.",
-      "Improved reliability and security by authoring 34% of the test suite, implementing multi-tenant database scoping, and remediating 2 SSRF vulnerabilities, 1 XSS vector and 1 CVE.",
-      "Rebuilt the Media Library using a blue-green migration, and co-led the Sanity-to-ProfoundCMS migration, contributing roughly 48% of the CMS integration layer.",
-    ],
-    pyxtrace: [
-      "Built and published an open-source Python profiler to PyPI, combining bytecode tracing, heap profiling and OS syscall monitoring with real-time visualisation.",
-      "Designed a cross-platform tracing architecture with pluggable Linux, macOS, Windows and fallback backends.",
-      "Implemented configurable tracing modes to balance profiling depth against runtime overhead, making long-running workloads practical to trace.",
-      "Automated PyPI releases with GitHub Actions and added JSONL session recording with offline replay.",
-    ],
-    "saferoute-india": [
-      "Architected an accident-aware route scoring platform over Indian government accident datasets, scoring routes 0–100 on severity, distance, recency and time-of-day risk.",
-      "Built a PostGIS geospatial scoring engine to analyse accident exposure along route corridors and identify safety hotspots across road networks.",
-      "Developed a LightGBM risk prediction pipeline using 24 engineered features covering severity, causal factors, temporal patterns, weather and emergency infrastructure.",
-      "Delivered 13 REST APIs for route scoring, hotspot analysis, departure-time optimisation, risk forecasting, SOS context and community incident reporting.",
-    ],
-  } as Record<string, string[]>,
-};
+/** The résumé PDF, served from `public/`. */
+export const resumePdf = "/abhineet-saha-resume.pdf";
 
 export const stack = [
   { label: "Languages", items: "TypeScript · Python · JavaScript · Java · SQL" },
