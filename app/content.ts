@@ -559,7 +559,7 @@ export const leadership = [
 ];
 
 /** The résumé PDF, served from `public/`. */
-export const resumePdf = "/abhineet-saha-resume.pdf";
+export const resumePdf = "/Abhineet_Saha_s_Resume.pdf";
 
 export const stack = [
   { label: "Languages", items: "TypeScript · Python · JavaScript · Java · SQL" },
