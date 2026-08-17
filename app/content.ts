@@ -22,13 +22,13 @@ export const links = {
 /** Two sentences, max. This is the part people actually read. */
 export const intro = [
   "I build backend systems, developer tools, and the infrastructure that sits underneath web applications.",
-  "Right now that means CMS infrastructure — rendering, content modelling, and the tooling around them. Before that, mostly things I wanted to exist: a Python tracer, a routing engine scored on real accident data.",
+  "Most recently that meant CMS infrastructure — rendering, content modelling, and the tooling around them. Before that, mostly things I wanted to exist: a Python tracer, a routing engine scored on real accident data.",
 ];
 
 export const now = [
   {
-    label: "Building",
-    body: "CMS infrastructure — rendering pipelines, content modelling and internal developer tooling.",
+    label: "Recently",
+    body: "Eight months on a multi-tenant CMS — routing, the database layer, the test suite and the editor-facing surfaces. Wrapped in August 2026.",
   },
   {
     label: "Exploring",
@@ -143,7 +143,7 @@ export const profound = {
   slug: "profound",
   org: "Profound",
   role: "Software Engineer",
-  period: "Jan 2026 — Present",
+  period: "Jan 2026 — Aug 2026",
   /** Homepage blurb for the Work section. */
   summary:
     "Multi-tenant headless CMS. Six-engineer team. I work on the routing engine, the database layer, the test suite and the editor-facing surfaces.",
