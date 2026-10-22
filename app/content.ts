@@ -68,22 +68,25 @@ export const projects: Project[] = [
     name: "PyxTrace",
     tagline: "Performance regression gate for Python CI · on PyPI",
     summary:
-      "Fails a pull request when it makes Python code do more work. Counts function calls and lines executed instead of timing them, so the same commit always gives the same numbers. Published to PyPI as pyxtrace, MIT licensed.",
+      "Fails a pull request when it makes Python code do more work. Counts function calls and lines executed instead of timing them, so the same commit on the same Python gives the same numbers every run. Published to PyPI as pyxtrace, MIT licensed.",
     stack: ["Python", "sys.settrace", "Rich", "GitHub Actions"],
     source: "https://github.com/AbhineetSaha/pyxTrace",
     external: { label: "PyPI", href: "https://pypi.org/project/pyxtrace/" },
     detail: {
       overview:
-        "A CI gate for Python performance regressions. PyxTrace records how many calls and lines each function executes while a benchmark script runs, saves the run against the commit, and diffs two commits. If any function grew past the threshold, it exits 1 and the build fails.",
+        "A CI gate for Python performance regressions. PyxTrace records how many calls and lines each function executes while a benchmark script runs, saves the run against the commit, and diffs two commits, or a commit against uncommitted work. If any function grew past the threshold, it exits 1 and the build fails.",
       problem:
         "Wall-clock benchmarks are too noisy to gate on. Seven timed runs of the same unchanged code on an idle machine spread by 3.1%; a shared CI runner is worse, and sub-millisecond workloads swing past 15%. So the threshold is either tight and flaky or wide and blind, and most teams end up deleting the job. Operation counts on the same seven runs were identical.",
       contribution: [
         "Designed and wrote the tool: the tracer, the run format, the diff and its attribution, and the CLI.",
-        "Rewrote it for 2.x. Version 1 was a live visual tracer for bytecode, heap and syscalls; 2.x is a regression gate. Published to PyPI, currently at 2.1.0, supporting Python 3.10 and up.",
+        "Rewrote it for 2.x. Version 1 was a live visual tracer for bytecode, heap and syscalls; 2.x is a regression gate. Published to PyPI, supporting Python 3.10 and up.",
+        "Hardened it in 3.0.0, a release where every change fixes a way the counts could drift or the gate could give a wrong or missing answer. Each fix was reproduced first and has a regression test.",
       ],
       approach: [
-        "A sys.settrace hook counts calls and lines per function, inside one root directory. Worker threads are covered through threading.settrace, and asyncio needs nothing extra because coroutines run on the event loop’s thread.",
-        "Each run is saved as .pyxtrace/<commit sha>.pyxt, so a gate diffs two commits by name. Because the counts are exact, the base commit’s run can be cached rather than re-recorded on every pull request.",
+        "A sys.settrace hook counts calls and lines per function, inside one root directory. Each thread counts into its own counters, merged when the run is read, so nothing is lost even on free-threaded Python; asyncio needs nothing extra because coroutines run on the event loop’s thread.",
+        "Determinism is handled rather than documented away. The CLI relaunches scripts with PYTHONHASHSEED=0, runs wait for threads the way python app.py does, and functions are keyed by qualified name so two classes’ __init__ never merge.",
+        "Each run is saved as .pyxtrace/<commit sha>.pyxt, so a gate diffs two commits by name. A run with uncommitted changes is saved separately and never overwrites the commit’s clean baseline. Because the counts are exact, the base commit’s run can be cached rather than re-recorded on every pull request.",
+        "diff exits 0 on a pass, 1 on a regression and 2 on a usage error or an unreadable run file, so CI can tell a caught regression from a broken setup.",
         "The diff attributes growth: the function where the extra work was introduced ranks above the functions that only ran more often because of it.",
         "It reports measurements, not conclusions. “Runs 120x and makes 1 more call each time” is what it prints; whether that is an N+1 is left to the reader, because one input size can’t tell the difference.",
         "A minimum-operations floor stops a 2 → 3 line change from tripping a percentage threshold. Timing is still shown for orientation, but never gated on.",
@@ -91,6 +94,7 @@ export const projects: Project[] = [
       challenges: [
         "Tracing every call is expensive: about 49x on a deliberately call-heavy worst case and about 9x on real code (sqlglot parsing 838 SQL statements), against cProfile’s 8x and 3.4x. A benchmark in the repo fails CI past 150x, so overhead can’t creep up unnoticed.",
         "Work inside C is invisible. A regression in a C extension, a regex or I/O adds no Python operations, so it isn’t caught — moving a workload onto a backtracking regex made it 230,000x slower with identical counts. The README leads with that limit instead of burying it.",
+        "Counts are exact per Python minor version, not across them: 3.12 inlined comprehensions, so moving from 3.11 reports false regressions with no code change. Each run records its interpreter, and diff warns when the two sides differ.",
         "Operation counts are a proxy for cost, not a measure of it. An algorithmic change can cut operations and still be slower, so the gate flags the regression and a real timer confirms it.",
       ],
     },
