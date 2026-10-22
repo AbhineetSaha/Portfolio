@@ -1,0 +1,53 @@
+---
+title: "Making the counts actually exact: PyxTrace 3.0"
+description: "The counts were supposed to be identical every run. Sometimes they weren't, and the gate had a few ways to give a wrong answer. 3.0.0 fixes them."
+date: "2026-10-23"
+tags: ["python", "ci", "testing", "open-source", "pyxtrace"]
+---
+
+The last write-up said PyxTrace gives the same counts every run, on any machine. That's the whole pitch, and it was too strong.
+
+3.0.0 is a hardening release. Each change fixes a way the gate could give a wrong or missing answer. I reproduced every bug before fixing it, and each one has a regression test in `tests/test_hardening.py`; on the commit before, 23 of those tests fail.
+
+## Counts that weren't exact
+
+Python randomises string hashing per process. That reorders every `set` and `dict` of strings, and a loop over one runs a different number of lines. One script reported 183, 189 and 175. The `pyxtrace` command now relaunches the script with `PYTHONHASHSEED=0`. The Python API can't do that, so it warns instead.
+
+Threads the script didn't join were cut off mid-run, and one workload came out at 73k, 61k and 79k lines. Runs now finish after Python's own thread shutdown, the same way `python app.py` waits. Daemon threads still running at exit are reported, because their counts are partial.
+
+All threads also wrote into the same counters. On free-threaded Python 3.14t that lost about 40% of counts under load, with five different results in five runs. Each thread now has its own counters, merged when the run is read, and the count comes out exact every time.
+
+Functions were keyed by bare name, so two classes' `__init__`, or every comprehension in a file, shared one entry. They're keyed by qualified name now, and `orders.py::execute` becomes `orders.py::Cursor.execute`. That changes the run file format, which is the one breaking change: runs recorded by 2.x are refused with a message to record them again. If your CI caches `.pyxtrace/`, change the cache key.
+
+## Counts move between Python versions
+
+Line counts also move between Python minor versions, because the interpreter decides which lines emit trace events. 3.12 inlined comprehensions, so going from 3.11 to 3.12 on the bundled orders example reports three false regressions at default settings.
+
+PyxTrace can't fix that, so it says so. Each run file records the interpreter it was made with, and `diff` warns when the two sides differ. Put the Python version in the cache key.
+
+So the accurate claim is narrower than the one I made: same code, same input, same Python minor version, same counts.
+
+## Wrong answers from diff
+
+Some bugs were in the comparison itself:
+
+- `--threshold nan` switched the gate off. NaN compares false against any growth, so a +300% regression exited 0. Negative, `nan` and `inf` settings are now errors.
+- `--threshold 0` reported every unchanged function as a regression.
+- Growth of exactly the threshold failed the gate, though the help, the README and the PASS line all say "more than". It now passes.
+- A run with uncommitted changes was filed under HEAD's sha and overwrote that commit's clean baseline. Dirty runs now go to `<sha>-dirty.pyxt`, and `pyxtrace diff main` compares main against the checkout as it is now.
+
+Others failed without saying anything:
+
+- A script ending in `sys.exit(main())` wrote no run file and exited 0. A clean exit now counts as a finished run. A non-zero exit or an exception records nothing and says so, since a partial count isn't a baseline.
+- `pyxtrace app.py | head` lost the run to a broken pipe. The run is saved before anything is printed now.
+- A path like `[legacy]/mod.py` was read as Rich markup, so the report named a file that doesn't exist, and a `[/]` in a path crashed it.
+
+`diff` now exits 0 on a pass, 1 on a regression and 2 on a usage error or an unreadable run file. The repo's own example gate has to exit exactly 1; it used to accept a usage error as a caught regression.
+
+## Stricter checks in the repo
+
+CI now runs ruff and mypy, on Windows and macOS, and on Python 3.14 and free-threaded 3.14t. It builds the wheel, installs it, and checks that the installed package catches a regression. Publishing runs the tests first, and a PyPI outage stops the job instead of reading as "this version isn't published yet".
+
+## What it cost
+
+The per-thread counters cost 3 to 9% on `fib(22)`. Reading the shard and the qualified name without a function call each brought the tracer back to 2.1.0's speed, so the overhead numbers from the last write-up still hold.
