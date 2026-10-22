@@ -1,0 +1,71 @@
+---
+title: "Counting instead of timing: catching Python slowdowns in CI"
+description: "Why PyxTrace 2.x stopped measuring time and started counting operations, what that buys you in a pull-request gate, and what it can't see."
+date: "2026-10-23"
+tags: ["python", "performance", "ci", "open-source", "pyxtrace"]
+project: "pyxtrace"
+---
+
+Most performance checks in CI time something, compare it to last time, and fail if it got slower by more than some percent. The idea is fine. The measurement is the problem.
+
+Here is the same unchanged code run seven times on an idle laptop:
+
+```
+wall-clock       : 2.06ms  2.06ms  2.20ms  2.04ms  2.06ms  2.05ms  2.17ms   → 3.1% spread
+operation counts : 3196    3196    3196    3196    3196    3196    3196     → 0.0% spread
+```
+
+A 3.1% spread is the good case. A shared CI runner with a noisy neighbour does worse, and sub-millisecond workloads swing past 15%. So you pick a threshold. Set it tight and the job fails on code nobody touched. Set it wide and a real 8% regression walks straight through. After enough false alarms, people delete the job.
+
+The second line in that output is why PyxTrace 2.x exists. The counts aren't "stable". They're identical.
+
+## What it counts
+
+PyxTrace runs your script under a tracer and counts two things per function: how many times it was called and how many lines it executed. Same code, same input, same counts, every run, on any machine.
+
+Runs are saved under the commit they came from, so `pyxtrace diff HEAD~1 HEAD` compares two commits and exits 1 if any function grew past the threshold (10% by default). That's all a CI step needs. Since a commit always produces the same bytes, the base run can be cached instead of re-recorded on every PR.
+
+## What a caught regression looks like
+
+The repo ships a small example: an order processor with a batched customer lookup. Set `PYXTRACE_NPLUSONE=1` and it fetches each order's customer one at a time instead.
+
+```
+⚠  orders.py::process_order  +120 calls to other functions  (same code, more work)
+   process_order() runs 120x and makes 1 more call(s) to fetch_customer() each time
+   Attributed to:
+     orders.py::fetch_customer   0 → 120 calls   new
+
+⚠  orders.py::execute  +5,950% operations  (6 → 363)
+
+⚠  orders.py::fetch_customer  new operations  (0 → 240)
+
+✗ FAIL — 3 function(s) regressed
+```
+
+Three functions grew, but they're ranked. `process_order` is first because that's where the extra work was introduced. `execute` and `fetch_customer` only grew because they're now called more often.
+
+I spent a lot of this year removing N+1 queries from a production API, and finding them was always the slow part. This is the output I wanted in the PR instead.
+
+## Why it doesn't say "N+1"
+
+The report never calls this an N+1, on purpose. "Runs 120 times and makes one more call each time" is a measurement. "This is an N+1" is a conclusion, and one input size can't support it: a function that simply does more work per call produces the same shape. Interpreting it is still your job. The tool just makes sure you're looking at the right function.
+
+## What it can't see
+
+This matters more than anything above.
+
+**Work inside C is invisible.** PyxTrace counts Python operations. If a regression lives in a C extension, NumPy, a regex engine, a database driver or an I/O wait, there are no extra Python operations to count. I measured this: moving a workload onto a backtracking regex made it about 230,000x slower, the counts were byte-identical, and the gate passed.
+
+That's the mirror image of sampling profilers, which see time everywhere but can't give you a deterministic number. PyxTrace is strongest on pure-Python, CPU-bound code: parsers, template engines, serializers, business logic.
+
+Fewer operations also doesn't always mean faster, so gate on counts and confirm with a real timer. The [README](https://github.com/AbhineetSaha/pyxTrace) lists the other limits.
+
+## Overhead
+
+Tracing every call costs something, and I'd rather publish the number than have someone find it. On real code (sqlglot parsing 838 SQL statements) it's about 9x, against 3.4x for `cProfile`, so trace a representative benchmark, not your whole test suite. The repo's CI fails any change that pushes overhead past 150x.
+
+## What changed from 1.x
+
+PyxTrace 1.x traced bytecode, memory and (on Linux) syscalls onto a live dashboard. It showed a lot, but it didn't answer a specific question. 2.x answers one: did this commit make the code do more work? Getting there mostly meant deleting things, until Rich was the only runtime dependency left.
+
+If it misses a regression it should have caught, or flags one it shouldn't, I'd like to see the case. [Open an issue](https://github.com/AbhineetSaha/pyxTrace/issues).

@@ -3,15 +3,16 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { projects, site } from "../../content";
 import { Block, List } from "../../section";
+import { formatDate, getWriteups } from "../../writeups";
 
 export function generateStaticParams() {
-  return projects.map((project) => ({ slug: project.slug }));
+  return projects.map((project) => ({ project: project.slug }));
 }
 
 export async function generateMetadata({
   params,
-}: PageProps<"/projects/[slug]">): Promise<Metadata> {
-  const { slug } = await params;
+}: PageProps<"/projects/[project]">): Promise<Metadata> {
+  const { project: slug } = await params;
   const project = projects.find((p) => p.slug === slug);
   if (!project) return {};
 
@@ -31,12 +32,13 @@ export async function generateMetadata({
 
 export default async function ProjectPage({
   params,
-}: PageProps<"/projects/[slug]">) {
-  const { slug } = await params;
+}: PageProps<"/projects/[project]">) {
+  const { project: slug } = await params;
   const project = projects.find((p) => p.slug === slug);
   if (!project) notFound();
 
   const detail = project.detail;
+  const writeups = await getWriteups(project.slug);
 
   return (
     <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-6">
@@ -136,6 +138,43 @@ export default async function ProjectPage({
             </ul>
           )}
         </footer>
+
+        {writeups.length > 0 && (
+          <section id="write-ups" className="mt-12 border-t border-rule pt-6">
+            <h2 className="font-mono text-xs uppercase tracking-wider text-muted">
+              Write-ups
+            </h2>
+            <ol className="mt-2">
+              {writeups.map((post) => (
+                <li
+                  key={post.slug}
+                  className="group border-b border-rule py-6 last:border-b-0"
+                >
+                  <p className="font-mono text-xs text-muted tabular-nums">
+                    <time dateTime={post.date}>{formatDate(post.date)}</time>
+                  </p>
+                  <h3 className="mt-2 text-lg font-medium tracking-tight">
+                    <Link
+                      href={`/projects/${project.slug}/${post.slug}`}
+                      className="transition-colors group-hover:text-accent"
+                    >
+                      {post.title}
+                      <span
+                        aria-hidden
+                        className="ml-1.5 inline-block text-muted transition-transform duration-200 group-hover:translate-x-1 group-hover:text-accent"
+                      >
+                        →
+                      </span>
+                    </Link>
+                  </h3>
+                  <p className="mt-2 leading-relaxed text-ink/85">
+                    {post.description}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
       </article>
     </main>
   );

@@ -23,7 +23,7 @@ export const links = {
 /** Two sentences, max. This is the part people actually read. */
 export const intro = [
   "I build backend systems, developer tools, and the infrastructure that sits underneath web applications.",
-  "Most recently that meant CMS infrastructure — rendering, content modelling, and the tooling around them. Before that, mostly things I wanted to exist: a Python tracer, a routing engine scored on real accident data.",
+  "Most recently that meant CMS infrastructure — rendering, content modelling, and the tooling around them. Before that, mostly things I wanted to exist: a performance regression gate for Python CI, a routing engine scored on real accident data.",
 ];
 
 export const now = [
@@ -37,7 +37,7 @@ export const now = [
   },
   {
     label: "Open source",
-    body: "PyxTrace, plus assorted things that started as a problem I had.",
+    body: "PyxTrace 2.x, a performance regression gate for Python CI, plus assorted things that started as a problem I had.",
   },
 ];
 
@@ -66,39 +66,32 @@ export const projects: Project[] = [
   {
     slug: "pyxtrace",
     name: "PyxTrace",
-    tagline: "Python runtime tracer · on PyPI",
+    tagline: "Performance regression gate for Python CI · on PyPI",
     summary:
-      "Traces a Python program’s bytecode, heap and syscalls on one timeline, then renders it live. Published to PyPI as pyxtrace, MIT licensed.",
-    stack: [
-      "Python",
-      "sys.settrace",
-      "tracemalloc",
-      "strace",
-      "Typer",
-      "Streamlit",
-      "GitHub Actions",
-    ],
+      "Fails a pull request when it makes Python code do more work. Counts function calls and lines executed instead of timing them, so the same commit always gives the same numbers. Published to PyPI as pyxtrace, MIT licensed.",
+    stack: ["Python", "sys.settrace", "Rich", "GitHub Actions"],
     source: "https://github.com/AbhineetSaha/pyxTrace",
     external: { label: "PyPI", href: "https://pypi.org/project/pyxtrace/" },
     detail: {
       overview:
-        "A tracing tool that puts a Python program under the microscope while it runs — bytecode execution, heap usage and (on Linux and macOS) system calls, correlated on a single timeline and streamed to a live dashboard.",
+        "A CI gate for Python performance regressions. PyxTrace records how many calls and lines each function executes while a benchmark script runs, saves the run against the commit, and diffs two commits. If any function grew past the threshold, it exits 1 and the build fails.",
       problem:
-        "Python’s profiling tools each answer one question in isolation. cProfile tells you where time went. tracemalloc tells you where memory went. strace tells you what the process asked the kernel for. None of them tell you that the allocation spike and the syscall storm happened in the same twelve milliseconds — and that correlation is usually the whole answer.",
+        "Wall-clock benchmarks are too noisy to gate on. Seven timed runs of the same unchanged code on an idle machine spread by 3.1%; a shared CI runner is worse, and sub-millisecond workloads swing past 15%. So the threshold is either tight and flaky or wide and blind, and most teams end up deleting the job. Operation counts on the same seven runs were identical.",
       contribution: [
-        "Designed and wrote the tool: tracer core, event model, CLI and dashboard.",
-        "Packaged and published it to PyPI, currently at 1.2.0, supporting Python 3.8 and up.",
+        "Designed and wrote the tool: the tracer, the run format, the diff and its attribution, and the CLI.",
+        "Rewrote it for 2.x. Version 1 was a live visual tracer for bytecode, heap and syscalls; 2.x is a regression gate. Published to PyPI, currently at 2.1.0, supporting Python 3.10 and up.",
       ],
       approach: [
-        "Three independent collectors — a sys.settrace hook for bytecode, periodic tracemalloc snapshots for the heap, and strace for syscalls — emit into one ordered event stream.",
-        "Output is either a Rich summary in the terminal or an optional Streamlit dashboard, so the common case needs no browser.",
-        "Presets (demo, perf, full) pick a tracing depth, because full bytecode tracing is far too heavy to be the default.",
-        "Sessions record to JSONL and replay offline, so a trace can be analysed after the fact rather than only while it runs.",
-        "Releases publish to PyPI from GitHub Actions, because a manual publish step is a release that eventually doesn’t happen.",
+        "A sys.settrace hook counts calls and lines per function, inside one root directory. Worker threads are covered through threading.settrace, and asyncio needs nothing extra because coroutines run on the event loop’s thread.",
+        "Each run is saved as .pyxtrace/<commit sha>.pyxt, so a gate diffs two commits by name. Because the counts are exact, the base commit’s run can be cached rather than re-recorded on every pull request.",
+        "The diff attributes growth: the function where the extra work was introduced ranks above the functions that only ran more often because of it.",
+        "It reports measurements, not conclusions. “Runs 120x and makes 1 more call each time” is what it prints; whether that is an N+1 is left to the reader, because one input size can’t tell the difference.",
+        "A minimum-operations floor stops a 2 → 3 line change from tripping a percentage threshold. Timing is still shown for orientation, but never gated on.",
       ],
       challenges: [
-        "Tracing every bytecode instruction is expensive enough to distort the program being measured. The presets and an event-rate throttle (10–500 events/sec) exist to keep the observer from becoming the bottleneck.",
-        "Syscall tracing is platform-bound: it needs strace and elevated privileges on Linux, and doesn’t exist on Windows. The tracer degrades to bytecode and memory rather than refusing to run.",
+        "Tracing every call is expensive: about 49x on a deliberately call-heavy worst case and about 9x on real code (sqlglot parsing 838 SQL statements), against cProfile’s 8x and 3.4x. A benchmark in the repo fails CI past 150x, so overhead can’t creep up unnoticed.",
+        "Work inside C is invisible. A regression in a C extension, a regex or I/O adds no Python operations, so it isn’t caught — moving a workload onto a backtracking regex made it 230,000x slower with identical counts. The README leads with that limit instead of burying it.",
+        "Operation counts are a proxy for cost, not a measure of it. An algorithmic change can cut operations and still be slower, so the gate flags the regression and a real timer confirms it.",
       ],
     },
   },
@@ -169,7 +162,7 @@ export const profound = {
   period: "Jan 2026 — Aug 2026",
   /** Homepage blurb for the Work section. */
   summary:
-    "Multi-tenant headless CMS. Six-engineer team. I work on the routing engine, the database layer, the test suite and the editor-facing surfaces.",
+    "Multi-tenant headless CMS. Six-engineer team. I worked on the routing engine, the database layer, the test suite and the editor-facing surfaces.",
   stack: ["TypeScript", "Next.js", "PostgreSQL", "tRPC"],
   intro: [
     "Profound is a multi-tenant headless CMS — schema builder, document and variant management, media library, routing engine, live preview. It is not my project. Six engineers build it, two of them own more of it than I do, and it existed before I arrived.",
