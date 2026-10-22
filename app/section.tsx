@@ -4,13 +4,15 @@
  */
 export function Section({
   title,
+  id,
   children,
 }: {
   title: string;
+  id?: string;
   children: React.ReactNode;
 }) {
   return (
-    <section className="mt-16 border-t border-rule pt-8 sm:mt-20">
+    <section id={id} className="mt-16 border-t border-rule pt-8 sm:mt-20">
       <div className="sm:grid sm:grid-cols-[7rem_1fr] sm:gap-x-8">
         <h2 className="mb-6 font-mono text-xs uppercase tracking-wider text-muted sm:sticky sm:top-8 sm:mb-0 sm:self-start">
           {title}

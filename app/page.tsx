@@ -13,8 +13,18 @@ import {
   stack,
   work,
 } from "./content";
+import { getWriteups } from "./writeups";
 
-export default function Home() {
+export default async function Home() {
+  const writeups = Object.fromEntries(
+    await Promise.all(
+      projects.map(
+        async (project) =>
+          [project.slug, await getWriteups(project.slug)] as const,
+      ),
+    ),
+  );
+
   return (
     <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-6">
       {/* Identity — everything that matters is above the fold. */}
@@ -87,7 +97,7 @@ export default function Home() {
         </ol>
       </Section>
 
-      <Section title="Projects">
+      <Section title="Projects" id="projects">
         <ol className="-mt-2">
           {projects.map((project, i) => (
             <li
@@ -127,8 +137,10 @@ export default function Home() {
                 {project.stack.join(" · ")}
               </p>
 
-              {(project.source || project.external) && (
-                <p className="mt-3 flex gap-4 pl-8 font-mono text-xs">
+              {(project.source ||
+                project.external ||
+                writeups[project.slug].length > 0) && (
+                <p className="mt-3 flex flex-wrap gap-x-4 gap-y-2 pl-8 font-mono text-xs">
                   {project.source && (
                     <a
                       href={project.source}
@@ -144,6 +156,16 @@ export default function Home() {
                     >
                       {project.external.label} ↗
                     </a>
+                  )}
+                  {writeups[project.slug].length > 0 && (
+                    <Link
+                      href={`/projects/${project.slug}#write-ups`}
+                      className="border-b border-rule pb-0.5 text-muted transition-colors hover:border-accent hover:text-ink"
+                    >
+                      {writeups[project.slug].length === 1
+                        ? "1 write-up"
+                        : `${writeups[project.slug].length} write-ups`}
+                    </Link>
                   )}
                 </p>
               )}
