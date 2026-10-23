@@ -37,7 +37,7 @@ export const now = [
   },
   {
     label: "Open source",
-    body: "PyxTrace 2.x, a performance regression gate for Python CI, plus assorted things that started as a problem I had.",
+    body: "PyxTrace, a performance regression gate for Python CI, and UniRGB, one app for PC lighting without vendor software. Building tenantscope next.",
   },
 ];
 
@@ -100,6 +100,46 @@ export const projects: Project[] = [
     },
   },
   {
+    slug: "unirgb",
+    name: "UniRGB",
+    tagline: "PC lighting without vendor software · Windows",
+    summary:
+      "One open-source Windows app for PC lighting. It talks to supported devices directly over HID, without their vendor apps, and lists every device it can't control with the reason. Python standard library only, GPL-3.0.",
+    stack: ["Python", "HID", "Tk", "PyInstaller", "Inno Setup"],
+    source: "https://github.com/AbhineetSaha/UniRGB",
+    external: {
+      label: "Latest release",
+      href: "https://github.com/AbhineetSaha/UniRGB/releases/latest",
+    },
+    detail: {
+      overview:
+        "A tray app that controls the lighting on a Razer Basilisk V3 Pro, MSI's Mystic Light controller, Evision V2 keyboards, an Ant Esports AIO pump display and ENE-controlled RAM by talking to each device directly. Anything it finds but can't control is still listed, with the reason. Razer Chroma devices fall back to Razer's SDK when Synapse is installed.",
+      contribution: [
+        "Designed and wrote it, from the device protocols to the installer.",
+      ],
+      approach: [
+        "Lighting is written live and never saved to the device. Quitting hands every device back to its own stored lighting.",
+        "The pump display uses a chip other gadgets share, so UniRGB sends nothing to it until you confirm the device is your cooler.",
+        "When Razer Synapse or MSI Center already holds a device, UniRGB says which app it is and how to release it, instead of fighting it for the device.",
+        "Lighting needs no driver and no admin rights. CPU temperature and RAM lighting need the PawnIO driver, which is installed after one admin prompt and only if you tick those features.",
+        "No third-party packages at runtime: the standard library, and Tk for the window.",
+      ],
+      challenges: [
+        "The installer builds PyInstaller's bootloader locally, because the stock prebuilt one is shared with a lot of malware and antivirus flags apps built with it far more often.",
+        "The build downloads PawnIO's official installer and refuses to continue unless its SHA-256 matches the pinned hash.",
+        "Releases aren't code-signed yet, so Windows SmartScreen warns on install. Each release lists checksums you can verify.",
+      ],
+    },
+  },
+  {
+    slug: "tenantscope",
+    name: "tenantscope",
+    tagline: "Tenant-filter check for test suites · in progress",
+    summary:
+      "Reads the SQL your test suite actually sends and flags queries on tenant tables that have no tenant filter, with the call site. For app-layer isolation (Drizzle, Kysely, pg), not row-level security.",
+    stack: ["TypeScript", "PostgreSQL"],
+  },
+  {
     slug: "saferoute-india",
     name: "SafeRoute India",
     tagline: "Routing scored on real accident data",
@@ -108,7 +148,6 @@ export const projects: Project[] = [
     stack: [
       "FastAPI",
       "PostGIS",
-      "LightGBM",
       "Redis",
       "React",
       "Docker",
@@ -128,8 +167,6 @@ export const projects: Project[] = [
         "Those incidents are weighted by severity (fatal, grievous, minor), recency, and time-of-day pattern — a late-night blackspot should not penalise a 9am commute equally.",
         "Scored routes are cached in Redis, since the same corridors get requested constantly and the spatial query is the expensive part.",
         "Hotspot clustering surfaces dangerous stretches directly on the map instead of hiding them inside a score.",
-        "A LightGBM model over 24 engineered features — severity, causal factors, temporal pattern, weather, distance to emergency infrastructure — handles risk prediction where the historical counts are too sparse to score directly.",
-        "Thirteen REST endpoints cover route scoring, hotspot analysis, departure-time optimisation, risk forecasting, SOS context and community incident reporting.",
       ],
       challenges: [
         "Government accident data arrives in inconsistent shapes across sources and needs normalising before any of it is spatially queryable.",
